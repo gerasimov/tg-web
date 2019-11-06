@@ -1,6 +1,6 @@
 type ComponentOptions = {};
 
-import { on } from "../core/dom/utils";
+import { on } from "./utils";
 
 export default function Component(target: any) {
   target.isComponent = true;

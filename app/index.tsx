@@ -1,16 +1,8 @@
-import { T } from "./core/dom/t";
+import { T } from "app/core/dom";
+import App from "app/ui/app";
 
-import Input from "./components/input";
-import LoginLayout from "./layouts/login-layout";
+const rootEl = document.getElementById("root");
 
-import "./styles/base.less";
-
-const root = document.querySelector("#root");
-
-if (root) {
-  root.appendChild(
-    <LoginLayout>
-      <Input />
-    </LoginLayout>
-  );
+if (rootEl) {
+  rootEl.appendChild(T(App, {}));
 }

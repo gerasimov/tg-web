@@ -16,7 +16,10 @@ module.exports = {
   },
 
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".jsx", ".less"]
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".less"],
+    alias: {
+      app: path.resolve(process.cwd(), "app")
+    }
   },
 
   module: {
@@ -39,7 +42,7 @@ module.exports = {
   plugins: [
     new CheckerPlugin(),
     new HtmlWebpackPlugin({
-      template: path.resolve(process.cwd(), "app", "template.html")
+      template: path.resolve(process.cwd(), "app", "ui", "template.html")
     })
   ]
 };

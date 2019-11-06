@@ -10,7 +10,7 @@ function createNode(Component: any, props: any, childs: any) {
     if (childs) {
       inst.props.children = childs;
     }
-    element = inst.render();
+    element = inst.render(inst.props);
     inst.rootEl = element;
   }
 
@@ -21,13 +21,20 @@ function createNode(Component: any, props: any, childs: any) {
           case "ref":
             props.ref.current = element;
             break;
-          case "class":
-          case "className":
-            element.className = props[attrName];
-            break;
           default:
-            element.setAttribute(attrName, props[attrName]);
             break;
+        }
+
+        if (!inst) {
+          switch (attrName) {
+            case "class":
+            case "className":
+              element.className = props[attrName];
+              break;
+            default:
+              element.setAttribute(attrName, props[attrName]);
+              break;
+          }
         }
       }
     }
