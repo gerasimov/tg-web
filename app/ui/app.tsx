@@ -1,23 +1,23 @@
 import { T } from 'app/core/dom';
 import LoginLayout from 'app/ui/layouts/login-layout';
-
 import ChatLayout from 'app/ui/layouts/chat-layout';
+import { invokeApi } from 'app/core/mtproto/invokeApi';
+import { InitConnection } from 'app/core/mtproto/functions/InitConnection';
+
 import route, { initializeRoutes } from 'app/ui/router/history';
 
-import { MTPClient } from 'app/core/MTPClient'
-
 import 'app/ui/styles/base.less';
-
 
 class App {
   rootEl: any;
 
   init = async () => {
-    route('/', () => this.renderPage(<ChatLayout />));
     route('/login', () => this.renderPage(<LoginLayout />));
-
-    Promise.resolve().then(initializeRoutes);
-    new MTPClient().auth();
+    route('/', () => this.renderPage(<ChatLayout />));
+    await Promise.resolve()
+      .then(initializeRoutes)
+      .then(() => invokeApi(InitConnection.create().getBytes(true)))
+      .catch(e => console.error(e));
   };
 
   renderPage = (el: any) => {
