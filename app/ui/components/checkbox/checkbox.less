@@ -1,0 +1,38 @@
+.checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    visibility: hidden;
+  }
+
+  &-title {
+    margin-left: 15px;
+    font-size: 0.8rem;
+  }
+
+  &-mark {
+    position: relative;
+    // background: #4ea4f6;
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
+
+    &:after {
+      display: block;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      content: " ";
+      background: url("./checkboxempty.svg") no-repeat center;
+      transition: background 0.1s ease;
+    }
+  }
+
+  input[type="checkbox"]:checked + &-mark {
+    &:after {
+      background: url("./checkboxon.svg") no-repeat center;
+    }
+  }
+}

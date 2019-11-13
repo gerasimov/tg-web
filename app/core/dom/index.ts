@@ -1,2 +1,4 @@
 export * from "./t";
-export { default as Component, Ref } from "./component";
+export { Destroyable } from "./destroy";
+export { Ref } from "./ref";
+export { default as Component } from "./component";
