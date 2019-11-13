@@ -1,0 +1,56 @@
+@header-height: 50px;
+
+.l-chat {
+  height: 100vh;
+  display: flex;
+
+  .chat-container {
+    display: flex;
+    max-width: 1010px;
+    min-width: 300px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  section {
+    flex: auto;
+    background: #e7ebf0;
+    flex: 3;
+    overflow: auto;
+    border-right: 1px solid #e9ebed;
+  }
+
+  header {
+    background: white;
+    height: @header-height;
+
+    border: 1px solid #e9ebed;
+    margin-left: -1px;
+    margin-right: -1px;
+    z-index: 1;
+    box-shadow: 2px 3px 6px 0px rgba(0, 0, 0, 0.04);
+  }
+
+  aside {
+    border: 1px solid #e9ebed;
+    flex: 1;
+    height: 100%;
+    box-shadow: 2px 3px 6px 0px rgba(0, 0, 0, 0.04);
+    z-index: -1;
+  }
+}
+
+.dialogs {
+  height: calc(100% - 50px);
+  padding: 10px 0;
+  &-wrap {
+    height: calc(100% - @header-height);
+    overflow: auto;
+  }
+  &-search {
+    height: @header-height;
+  }
+  &-item {
+    padding: 1rem;
+  }
+}

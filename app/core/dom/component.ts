@@ -1,28 +1,12 @@
-type ComponentOptions = {};
-
-import { on } from "./utils";
-
 export default function Component(target: any) {
-  target.isComponent = true;
-  target.prototype.isComponent = true;
-
-  target.prototype.dom = {
-    on
+  target.prototype.setState = function(chunk: any) {
+    this.state = { ...this.state, ...chunk };
+    this.update();
   };
 
-  return target;
-}
-
-export function Ref(target: any, key: string): any {
-  const refVal: { current: any } = {
-    current: null
-  };
-
-  Object.defineProperty(target, key, {
-    get value(): { current: any } {
-      return refVal;
+  target.prototype.update = function() {
+    if (this.patch) {
+      this.patch(this.props, this.state);
     }
-  });
-
-  return refVal;
+  };
 }

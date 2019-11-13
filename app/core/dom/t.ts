@@ -2,57 +2,66 @@ function createNode(Component: any, props: any, childs: any) {
   let element = null;
   let inst = null;
 
-  if (typeof Component === "string") {
+  if (typeof Component === 'string') {
     element = document.createElement(Component);
-  } else if (Component.isComponent) {
+  } else {
     inst = new Component();
     inst.props = props || {};
-    if (childs) {
-      inst.props.children = childs;
-    }
+    inst.props.children = childs;
     element = inst.render(inst.props);
     inst.rootEl = element;
   }
 
-  if (element !== null && props !== null) {
-    for (let attrName in props) {
-      if (props.hasOwnProperty(attrName)) {
-        switch (attrName) {
-          case "ref":
-            props.ref.current = element;
-            break;
-          default:
-            break;
-        }
+  if (props === null) {
+    return { element, inst };
+  }
 
-        if (!inst) {
-          switch (attrName) {
-            case "class":
-            case "className":
-              element.className = props[attrName];
-              break;
-            default:
-              element.setAttribute(attrName, props[attrName]);
-              break;
-          }
+  const propsKeys = Object.keys(props);
+  let i = propsKeys.length;
+
+  while (i--) {
+    const attrName = propsKeys[i];
+
+    switch (attrName) {
+      case 'ref':
+        props.ref.current = element;
+        break;
+      case 'class':
+      case 'className':
+        element.className = props[attrName];
+        break;
+      default:
+        if (props[attrName] != null) {
+          element.setAttribute(attrName, props[attrName]);
         }
-      }
+        break;
     }
   }
 
   return { element, inst };
 }
 
-function appendNode(this: any) {
-  for (let i = 0; i < arguments.length; i++) {
-    const child = arguments[i];
+function appendNode(el: any, childs: any[]) {
+  const size = childs.length;
+  let i = size;
+
+  while (i--) {
+    const child = childs[size - i - 1];
 
     if (child instanceof HTMLElement) {
-      this.appendChild(child);
+      el.appendChild(child);
     } else if (Array.isArray(child)) {
-      appendNode.apply(this, child);
+      const doc = document.createDocumentFragment();
+      for (let z = 0; z < child.length; z++) {
+        doc.appendChild(
+          child[z] instanceof HTMLElement
+            ? child[z]
+            : document.createTextNode(child[z]),
+        );
+      }
+      el.appendChild(doc);
     } else {
-      this.appendChild(document.createTextNode(child));
+      el.appendChild(document.createTextNode(child));
     }
   }
 }
@@ -60,16 +69,14 @@ function appendNode(this: any) {
 const T = function(Component: any, props: any, ...childs: any) {
   const { element, inst } = createNode(Component, props, childs);
 
-  if (inst && inst.isComponent) {
+  if (inst !== null) {
     if (inst.init) {
       inst.init();
     }
-  } else {
-    if (childs.length !== 0) {
-      const doc = document.createDocumentFragment();
-      appendNode.apply(doc, childs);
-      element.appendChild(doc);
-    }
+  } else if (childs.length !== 0) {
+    const doc = document.createDocumentFragment();
+    appendNode(doc, childs);
+    element.appendChild(doc);
   }
 
   return element;
