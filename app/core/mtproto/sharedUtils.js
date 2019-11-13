@@ -24,7 +24,7 @@ export function addPadding(bytes, blockSize) {
 }
 
 
-function bufferConcat(buffer1, buffer2) {
+export function bufferConcat(buffer1, buffer2) {
   const l1 = buffer1.byteLength || buffer1.length;
   const l2 = buffer2.byteLength || buffer2.length;
   const tmp = new Uint8Array(l1 + l2);

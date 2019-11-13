@@ -86,8 +86,11 @@ export class MessageCreator {
         ? this.longP(sLong[0], sLong[1])
         : this.intBytes(sLong, 64);
     let str;
-    if (typeof sLong !== 'string') str = sLong ? sLong.toString() : '0';
-    else str = sLong;
+    if (typeof sLong !== 'string') {
+      str = sLong ? sLong.toString() : '0';
+    } else {
+      str = sLong;
+    }
     const [int1, int2] = longToInts(str);
 
     return this.longP(int1, int2);
@@ -101,30 +104,23 @@ export class MessageCreator {
     if (data === undefined) {
       data = '';
     }
-    const sUTF8 = unescape(encodeURIComponent(data));
 
-    const len = sUTF8.length;
-    if (len <= 253) {
-      this.byteView[this.offset++] = len;
-    } else {
-      this.byteView[this.offset++] = 254;
-      this.byteView[this.offset++] = len & 0xff;
-      this.byteView[this.offset++] = (len & 0xff00) >> 8;
-      this.byteView[this.offset++] = (len & 0xff0000) >> 16;
-    }
-    for (let i = 0; i < len; i++) {
-      this.byteView[this.offset++] = sUTF8.charCodeAt(i);
-    }
+    return this.bytes(unescape(encodeURIComponent(data)));
+  }
 
-    // Padding
-    while (this.offset % 4) {
-      this.byteView[this.offset++] = 0;
+  raw(bytes: any) {
+    if (bytes instanceof ArrayBuffer) {
+      bytes = new Uint8Array(bytes);
     }
+    const len = bytes.length;
+
+    this.byteView.set(bytes, this.offset);
+    this.offset += len;
 
     return this;
   }
 
-  getBytes(typed: boolean) {
+  getBytes(typed: boolean): Uint8Array | number[] {
     if (typed) {
       const resultBuffer = new ArrayBuffer(this.offset);
       const resultArray = new Uint8Array(resultBuffer);

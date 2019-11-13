@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin');
 const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
 
 const path = require('path');
@@ -57,7 +58,8 @@ module.exports = {
   plugins: [
     new CheckerPlugin(),
     new HtmlWebpackPlugin({
-      template: path.resolve(process.cwd(), 'app', 'ui', 'template.html'),
+      template: path.resolve(process.cwd(), 'app', 'template.html'),
+      favicon: 'app/favicon.ico',
     }),
     new MiniCssExtractPlugin({}),
     new BundleAnalyzerPlugin(),
@@ -76,6 +78,7 @@ module.exports = {
           // https://github.com/webpack-contrib/terser-webpack-plugin#terseroptions
         },
       }),
+      new OptimizeCssAssetsWebpackPlugin({})
     ],
   },
   node: {

@@ -1,3 +1,4 @@
+import { http } from 'app/core/mtproto/http';
 import { generateMessageID } from 'app/core/mtproto/time';
 import { MessageCreator } from 'app/core/mtproto/MessageCreator';
 
@@ -19,11 +20,5 @@ export function invoke(payload: ArrayBuffer) {
   const requestArray = new Int32Array(payload);
   resultArray.set(requestArray, headerArray.length);
 
-  return fetch('http://149.154.167.40:443/apiw1', {
-    method: 'POST',
-    body: resultArray,
-  })
-    .then(r => r.blob())
-    .then((b: any) => b.arrayBuffer())
-    .then(buf => buf.slice(20));
+  return http(resultArray).then((buf: any) => buf.slice(20));
 }
