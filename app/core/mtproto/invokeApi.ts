@@ -24,13 +24,12 @@ export async function invokeApi(body: Uint8Array | number[]) {
     .int(message.body.length)
     .raw(message.body);
 
-  const dataBuffer = data.pack()
+  const dataBuffer = data.pack();
 
   const paddingLength = 16 - (data.offset % 16) + 16 * (1 + nextRandomInt(5));
   const padding = new SecureRandom().nextBytes(new Array(paddingLength));
   const dataWithPadding = bufferConcat(dataBuffer, padding);
   const authKeyUint8 = convertToUint8Array(bytesFromHex(authData.authKey));
-
 
   const x = 0; //true ? 0 : 8;
   const msgKeyLargePlain = bufferConcat(
