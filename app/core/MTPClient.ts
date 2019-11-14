@@ -151,7 +151,7 @@ class MTPClient {
  
       const serverSalt = bytesXor(
         this.session.new_nonce.slice(0, 8),
-        dhGenOk.server_nonce.slice(0, 8),
+        this.session.server_nonce.slice(0, 8),
       );
 
       const authPayload = {

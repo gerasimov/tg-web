@@ -5,7 +5,7 @@ function createNode(Component: any, props: any, childs: any) {
   if (typeof Component === 'string') {
     element = document.createElement(Component);
   } else {
-    inst = new Component();
+    inst = new Component(props || {});
     inst.props = props || {};
     inst.props.children = childs;
     element = inst.render(inst.props);
@@ -31,8 +31,10 @@ function createNode(Component: any, props: any, childs: any) {
         element.className = props[attrName];
         break;
       default:
-        if (props[attrName] != null) {
-          element.setAttribute(attrName, props[attrName]);
+        if (!inst) {
+          if (props[attrName] != null) {
+            element.setAttribute(attrName, props[attrName]);
+          }
         }
         break;
     }

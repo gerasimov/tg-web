@@ -24,7 +24,7 @@ export class MessageCreator {
       bytes = new Uint8Array(bytes);
     }
     const len = bytes.length;
-    if (bits % 32 || len * 8 != bits) {
+    if ((bits % 32) || (len * 8) !== bits) {
       console.error('Invalid bits: ' + bits + ', ' + bytes.length);
       return this;
     }

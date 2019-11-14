@@ -49,7 +49,7 @@ export class MessageReader {
     for (let i = 0; i < len; i++) {
       bytes.push(this.byteView[this.offset++]);
     }
-
+    
     return bytes;
   }
 
