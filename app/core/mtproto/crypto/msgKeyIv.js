@@ -1,4 +1,4 @@
-import { sha1BytesSync } from 'app/core/mtproto/crypto/sha1'
+import { sha1BytesSync, sha1HashSync } from 'app/core/mtproto/crypto/sha1'
 
 export async function getMsgKeyIv(authKey, msgKey, isOut) {
   const x = isOut ? 0 : 8;
@@ -22,10 +22,10 @@ export async function getMsgKeyIv(authKey, msgKey, isOut) {
 
   const aesKey = new Uint8Array(32),
     aesIv = new Uint8Array(32),
-    sha1a = new Uint8Array(sha1BytesSync(sha1aText)),
-    sha1b = new Uint8Array(sha1BytesSync(sha1bText)),
-    sha1c = new Uint8Array(sha1BytesSync(sha1cText)),
-    sha1d = new Uint8Array(sha1BytesSync(sha1dText));
+    sha1a = new Uint8Array(sha1HashSync(sha1aText)),
+    sha1b = new Uint8Array(sha1HashSync(sha1bText)),
+    sha1c = new Uint8Array(sha1HashSync(sha1cText)),
+    sha1d = new Uint8Array(sha1HashSync(sha1dText));
 
   aesKey.set(sha1a.subarray(0, 8));
   aesKey.set(sha1b.subarray(8, 20), 8);

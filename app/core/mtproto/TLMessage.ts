@@ -25,7 +25,7 @@ export class TLMessage {
     return Object.assign(this, {
       msg_id,
       seq_no,
-      body,
+      body
     });
   }
 }
