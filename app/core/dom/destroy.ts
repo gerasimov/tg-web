@@ -4,6 +4,7 @@ const observers: any = {};
 
 export function Destroyable(target: any) {
   const originalMethod = target.prototype.init;
+  const hasDestroy = Boolean(target.prototype.destroy);
 
 
   target.prototype.init = function() {
