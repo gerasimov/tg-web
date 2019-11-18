@@ -6,6 +6,9 @@ import Button from 'app/ui/components/button';
 import { Component, Destroyable, Ref, T } from 'app/core/dom';
 
 import countries from 'app/ui/countries';
+import { invokeApi } from 'app/core/api/invokeApi';
+import { SendCode } from 'app/core/mtproto/functions/auth/SendCode';
+import ev from 'app/core/eventEmmiter';
 
 const countryOptions = Object.keys(countries).reduce(
   (acc: any, country: string) => {
@@ -27,6 +30,7 @@ class CountryPhone {
   @Ref countryInputRef: any;
   @Ref phoneNumberRef: any;
   @Ref formRef: any;
+  @Ref nextRef: any;
 
   setState: any;
   state: any;
@@ -38,18 +42,34 @@ class CountryPhone {
     const { current: form } = this.formRef;
 
     this.on(form, 'submit', this.handleSubmit);
+    
+    ev.on('session-created', () => {
+      this.nextRef.current.removeAttribute('hidden');
+    });
   }
-  
+
   destroy = () => {
     this.off(this.formRef.current, 'submit', this.handleSubmit);
-  }
-  
-  handleSubmit = (e: Event) => {
+  };
+
+  handleSubmit = async (e: Event) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    const phone = this.phoneNumberRef.current.value;
+    this.props.main.phone = phone;
 
-    this.props.next();
-  }
+    try {
+      this.props.main.hashPhone = await invokeApi(SendCode(phone));
+      this.props.next();
+    } catch (e) {
+      this.props.next();
+    }
+  };
+
+  handleCountrySelect = (country: string) => {
+    this.setState({ country });
+  };
 
   render = () => (
     <div class="wrap">
@@ -67,20 +87,22 @@ class CountryPhone {
       >
         <div class="login-form__input input-space">
           <Select
+            class="country-select"
             name="tg-country"
             options={countryOptions}
             ref={this.countryInputRef}
             placeholder="Country"
             autocomplete={HACK_FOR_DISABLE_AUTOCOMPLETION}
-            onSelect={(val: string) => console.log(val)}
+            onSelect={this.handleCountrySelect}
           />
         </div>
         <div class="login-form__input input-space">
           <Input
             name="tg-phoneNumber"
-            pattern="\d"
+            required
             autocomplete={HACK_FOR_DISABLE_AUTOCOMPLETION}
             ref={this.phoneNumberRef}
+            type="tel"
             placeholder="Phone Number"
           />
         </div>
@@ -88,7 +110,7 @@ class CountryPhone {
           <Checkbox>Keep me signed in</Checkbox>
         </div>
         <div class="login-form__input">
-          <Button>Next</Button>
+          <Button hidden ref={this.nextRef}>Next</Button>
         </div>
       </form>
     </div>

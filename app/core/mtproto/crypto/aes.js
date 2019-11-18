@@ -1,5 +1,5 @@
-import CryptoJS from 'app/core/mtproto/vendors/cryptojs';
-import { addPadding } from 'app/core/mtproto/sharedUtils';
+import CryptoJS from 'app/core/vendors/cryptojs';
+import { addPadding } from 'app/core/mtproto/crypto/shared';
 
 export function aesDecryptSync(encryptedBytes, keyBytes, ivBytes) {
   console.log('AES decrypt start', encryptedBytes.length);
@@ -15,7 +15,6 @@ export function aesDecryptSync(encryptedBytes, keyBytes, ivBytes) {
     );
     return bytesFromWords(decryptedWords);
   } catch (e) {
-    console.log(e);
     return null;
   }
 }
@@ -23,7 +22,7 @@ export function aesDecryptSync(encryptedBytes, keyBytes, ivBytes) {
 export function aesEncryptSync(bytes, keyBytes, ivBytes) {
   console.log('AES encrypt start');
   bytes = addPadding(bytes);
-  var encryptedWords = CryptoJS.AES.encrypt(
+  const encryptedWords = CryptoJS.AES.encrypt(
     bytesToWords(bytes),
     bytesToWords(keyBytes),
     {
@@ -33,7 +32,7 @@ export function aesEncryptSync(bytes, keyBytes, ivBytes) {
     },
   ).ciphertext;
 
-  var encryptedBytes = bytesFromWords(encryptedWords);
+  const encryptedBytes = bytesFromWords(encryptedWords);
   console.log('AES encrypt finish');
 
   return encryptedBytes;

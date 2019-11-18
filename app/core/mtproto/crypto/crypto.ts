@@ -12,16 +12,24 @@ type MethodName =
   | 'aes-decrypt'
   | 'bytes-pow'
   | 'mod-pow'
-  | 'get-msgkey-iv';
+  | 'get-iv';
+
 
 export function callMethod(type: MethodName, ...args: any[]): Promise<any> {
   return new Promise((res, rej) => {
-    worker.onmessage = (e: any) => {
+    const id = Math.random().toString(16);
+    
+    function handle(e) {
+      if (e.data.id !== id) {
+        return;
+      }
+      worker.removeEventListener('message', handle);
       if (e.data.error) {
-        return rej();
+        return rej(e.data.error);
       }
       res(e.data.res);
-    };
-    worker.postMessage({ type, args });
+    }
+    worker.addEventListener('message', handle);
+    worker.postMessage({ type, args, id });
   });
 }

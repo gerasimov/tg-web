@@ -5,18 +5,35 @@ const observers: any = {};
 export function Destroyable(target: any) {
   const originalMethod = target.prototype.init;
   const hasDestroy = Boolean(target.prototype.destroy);
+<<<<<<< HEAD
+
+
+  target.prototype.init = function() {
+    if (originalMethod != null) {
+      originalMethod.call(this);
+    }
+    const hasDestroy = Boolean(this.destroy);
+
+    if (hasDestroy) {
+=======
 
   if (hasDestroy) {
     target.prototype.init = function() {
       if (originalMethod != null) {
         originalMethod.call(this);
       }
+>>>>>>> master
       addDestroyObserver({
         el: this.rootEl,
         cb: this.destroy,
       });
+<<<<<<< HEAD
+    }
+  };
+=======
     };
   }
+>>>>>>> master
 }
 
 export function addDestroyObserver({

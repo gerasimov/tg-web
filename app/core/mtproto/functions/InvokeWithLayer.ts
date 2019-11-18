@@ -1,16 +1,13 @@
 import { MessageCreator } from 'app/core/mtproto/MessageCreator';
 
-export class InvokeWithLayer {
-  static CLASS_ID = 0xda9b0d0d;
+export function InvokeWithLayer(query?: MessageCreator) {
+  const m = new MessageCreator(4048).int(InvokeWithLayer.CLASS_ID).int(105);
 
-  static create = (query) => {
-    const m = new MessageCreator(2048).int(InvokeWithLayer.CLASS_ID).int(105);
-    
-    if (query) {
-      m.raw(query.getBytes(true))
-    }
-    
-    return m;
+  if (query) {
+    m.raw(query.getBytes(true));
   }
 
+  return m;
 }
+
+InvokeWithLayer.CLASS_ID = 0xda9b0d0d;

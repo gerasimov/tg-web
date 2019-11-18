@@ -1,25 +1,28 @@
 import { generateMessageID } from 'app/core/mtproto/time';
 
+let SeqNo = 1;
+
+export function generateSeqNo(notContentRelated: boolean = false): number {
+  let seqNo = SeqNo * 2;
+  if (!notContentRelated) {
+    seqNo++;
+    SeqNo++;
+  }
+
+  return seqNo;
+}
+
+
 export class TLMessage {
-  static SeqNo = 0;
   
   public msg_id: any;
   public seq_no: any;
   public body: any;
 
-  static generateSeqNo(notContentRelated: boolean = false): number {
-    let seqNo = TLMessage.SeqNo * 2;
-    if (!notContentRelated) {
-      seqNo++;
-      TLMessage.SeqNo++;
-    }
-
-    return seqNo;
-  }
 
   constructor({
     msg_id = generateMessageID(),
-    seq_no = TLMessage.generateSeqNo(),
+    seq_no = generateSeqNo(),
     body,
   }: any = {}) {
     return Object.assign(this, {

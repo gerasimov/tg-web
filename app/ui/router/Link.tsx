@@ -21,7 +21,6 @@ class Link {
   };
   
   destroy = () => {
-    console.log(this.aRef);
     this.aRef.current.removeEventListener('click', this.handleClick);
   }
   

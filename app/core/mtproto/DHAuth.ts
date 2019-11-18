@@ -1,12 +1,14 @@
+// ToDO: decompose this file
+
 import { invoke } from 'app/core/mtproto/invoke';
-import { SecureRandom } from 'app/core/mtproto/vendors/SecureRandom';
+import { rng_get_bytes } from 'app/core/vendors/SecureRandom';
 import { ReqPQ } from 'app/core/mtproto/types/ReqPQ';
 import { ResPQ } from 'app/core/mtproto/types/ResPQ';
 import { PQInnerData } from 'app/core/mtproto/types/PQInnerData';
 import { ReqDHParams } from 'app/core/mtproto/types/ReqDHParams';
 import { DHParamsOK } from 'app/core/mtproto/types/DHParamsOK';
-import { ClientDHInnerData } from './mtproto/types/ClientDHInnerData';
-import { SetClientDHParams } from 'app/core/mtproto/types/SetClientDHParams';
+import { ClientDHInnerData } from 'app/core/mtproto/types/ClientDHInnerData';
+import { SetClientDHParams } from 'app/core/mtproto/functions/SetClientDHParams';
 import { ServerDHInnerData } from 'app/core/mtproto/types/ServerDHInnerData';
 import { DHGenOk } from 'app/core/mtproto/types/DHGenOk';
 import { sha1BytesSync } from 'app/core/mtproto/crypto/sha1';
@@ -17,20 +19,20 @@ import { applyServerTime } from 'app/core/mtproto/time';
 import {
   bytesFromArrayBuffer,
   bytesFromHex,
-  bytesToHex,
 } from 'app/core/mtproto/crypto/shared';
+import authStorage from 'app/core/services/AuthStorage';
+import ev from 'app/core/eventEmmiter';
 
-class MTPClient {
+
+class DHAuth {
   session: any;
 
   auth = async () => {
-    const authData = this.getSavedTokens();
-
-    if (authData) {
-      return authData;
+    if (authStorage.authKey) {
+      return authStorage;
     }
 
-    const nonce = new SecureRandom().nextBytes(new Array(16));
+    const nonce = rng_get_bytes(new Array(16));
     this.session = {
       nonce,
     };
@@ -42,7 +44,7 @@ class MTPClient {
     Object.assign(this.session, {
       p,
       q,
-      new_nonce: new SecureRandom().nextBytes(new Array(32)),
+      new_nonce: rng_get_bytes(new Array(32)),
     });
 
     const dhRequest = await this.createDHRequest();
@@ -95,7 +97,7 @@ class MTPClient {
 
     applyServerTime(dhInnerData.server_time);
 
-    this.session.b = new SecureRandom().nextBytes(new Array(256));
+    this.session.b = rng_get_bytes(new Array(256));
 
     const clientDHInnerData = ClientDHInnerData.create({
       ...this.session,
@@ -129,10 +131,12 @@ class MTPClient {
       this.session.b,
       this.session.dh_prime,
     );
+    authStorage.authKey = authKey;
 
     const authKeyHash = bytesFromArrayBuffer(await callMethod('sha1', authKey));
     const authKeyAux = authKeyHash.slice(0, 8);
-    const authKeyID = authKeyHash.slice(-8);
+    authStorage.authKeyID = authKeyHash.slice(-8);
+    authStorage.sessionID = rng_get_bytes(new Array(8));
 
     const dhGenClassId = this.getResClassId(dhGenRes);
 
@@ -149,29 +153,14 @@ class MTPClient {
         console.error('new nonce hash error');
       }
  
-      const serverSalt = bytesXor(
+      authStorage.serverSalt = bytesXor(
         this.session.new_nonce.slice(0, 8),
         this.session.server_nonce.slice(0, 8),
       );
-
-      const authPayload = {
-        serverSalt: bytesToHex(serverSalt),
-        authKey: bytesToHex(authKey),
-        authKeyID: bytesToHex(authKeyID),
-      };
-
-      this.save(authPayload);
-
-      return authPayload;
+      
+      ev.emit('auth-done');
+      return authStorage;
     }
-  };
-
-  save = (data: any) => {
-    localStorage.setItem('auth', JSON.stringify(data));
-  };
-
-  getSavedTokens = () => {
-    return JSON.parse(localStorage.getItem('auth') || '0') || null;
   };
 
   createDHRequest = async () => {
@@ -192,4 +181,4 @@ class MTPClient {
   };
 }
 
-export { MTPClient };
+export default new DHAuth();

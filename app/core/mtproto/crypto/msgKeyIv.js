@@ -1,40 +1,32 @@
-import { sha1BytesSync, sha1HashSync } from 'app/core/mtproto/crypto/sha1'
+import { sha256Hash } from 'app/core/mtproto/crypto/sha256';
+import { concat, convertToUint8Array } from 'app/core/mtproto/crypto/shared'
 
-export async function getMsgKeyIv(authKey, msgKey, isOut) {
-  const x = isOut ? 0 : 8;
-  const sha1aText = new Uint8Array(48);
-  const sha1bText = new Uint8Array(48);
-  const sha1cText = new Uint8Array(48);
-  const sha1dText = new Uint8Array(48);
+export async function getMsgKeyIv(auth_key, msg_key, x) {
+  const sha256a = await sha256Hash(
+    concat(
+      new Uint8Array(msg_key),
+      new Uint8Array(auth_key).subarray(x, x + 36),
+    ),
+  ).then(convertToUint8Array);
 
-  sha1aText.set(msgKey, 0);
-  sha1aText.set(authKey.subarray(x, x + 32), 16);
+  const sha256b = await sha256Hash(
+    concat(
+      new Uint8Array(auth_key).subarray(40 + x, 40 + x + 36),
+      new Uint8Array(msg_key),
+    ),
+  ).then(convertToUint8Array);
 
-  sha1bText.set(authKey.subarray(x + 32, x + 48), 0);
-  sha1bText.set(msgKey, 16);
-  sha1bText.set(authKey.subarray(x + 48, x + 64), 32);
+  const aes_key = concat(
+    sha256a.subarray(0, 8),
+    sha256b.subarray(8, 8 + 16),
+    sha256a.subarray(24, 24 + 8),
+  );
 
-  sha1cText.set(authKey.subarray(x + 64, x + 96), 0);
-  sha1cText.set(msgKey, 32);
+  const aes_iv = concat(
+    sha256b.subarray(0, 8),
+    sha256a.subarray(8, 16 + 8),
+    sha256b.subarray(24, 24 + 8),
+  );
 
-  sha1dText.set(msgKey, 0);
-  sha1dText.set(authKey.subarray(x + 96, x + 128), 16);
-
-  const aesKey = new Uint8Array(32),
-    aesIv = new Uint8Array(32),
-    sha1a = new Uint8Array(sha1HashSync(sha1aText)),
-    sha1b = new Uint8Array(sha1HashSync(sha1bText)),
-    sha1c = new Uint8Array(sha1HashSync(sha1cText)),
-    sha1d = new Uint8Array(sha1HashSync(sha1dText));
-
-  aesKey.set(sha1a.subarray(0, 8));
-  aesKey.set(sha1b.subarray(8, 20), 8);
-  aesKey.set(sha1c.subarray(4, 16), 20);
-
-  aesIv.set(sha1a.subarray(8, 20));
-  aesIv.set(sha1b.subarray(0, 8), 12);
-  aesIv.set(sha1c.subarray(16, 20), 20);
-  aesIv.set(sha1d.subarray(0, 8), 24);
-
-  return [aesKey, aesIv];
+  return [aes_key, aes_iv];
 }
