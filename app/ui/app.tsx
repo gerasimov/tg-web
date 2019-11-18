@@ -3,10 +3,7 @@ import LoginLayout from 'app/ui/pages/login-layout';
 import ChatLayout from 'app/ui/pages/chat-layout';
 
 import { RegisterLayout } from 'app/ui/pages/register-layout';
-import { invokeApi } from 'app/core/mtproto/invokeApi';
 import route, { initializeRoutes } from 'app/ui/router/history';
-
-import { InvokeWithLayer } from 'app/core/mtproto/functions/InvokeWithLayer';
 
 import 'app/ui/styles/base.less';
 

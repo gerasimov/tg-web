@@ -6,25 +6,25 @@
 
   .chat-container {
     display: flex;
-    max-width: 1280px;
+    max-width: 1010px;
     min-width: 300px;
     width: 100%;
     margin: 0 auto;
   }
 
   section {
-    background: #e6ebee;
+    flex: auto;
+    background: #e7ebf0;
     flex: 3;
     overflow: auto;
-    border-right: 1px solid #dce1e3;
-    border-left: 1px solid #dce1e3;
+    border-right: 1px solid #e9ebed;
   }
 
   header {
     background: white;
     height: @header-height;
 
-    border: 1px solid #dce1e3;
+    border: 1px solid #e9ebed;
     margin-left: -1px;
     margin-right: -1px;
     z-index: 1;
@@ -32,124 +32,25 @@
   }
 
   aside {
-    flex: 1.15;
+    border: 1px solid #e9ebed;
+    flex: 1;
     height: 100%;
     box-shadow: 2px 3px 6px 0px rgba(0, 0, 0, 0.04);
-    
-    &.messages-sidebar {
-      border-right: 1px solid #dce1e3;
-    }
-    
-    &.dialogs-sidebar {
-      border-left: 1px solid #dce1e3;
-    }
+    z-index: -1;
   }
 }
 
 .dialogs {
-  height: 100%;
-  padding: 0 1rem;
+  height: calc(100% - 50px);
+  padding: 10px 0;
   &-wrap {
     height: calc(100% - @header-height);
     overflow: auto;
   }
   &-search {
     height: @header-height;
-    display: flex;
-    align-items: center;
-    padding: 0 1rem;
-    
-    .drawer {
-      background: url("~app/ui/assets/menu_svg.svg") no-repeat center center;
-      height: 2rem;
-      width: 2rem;
-      padding-right: 1rem;
-      margin-right: 1rem;
-      cursor: pointer;
-    }
   }
   &-item {
-    display: flex;
-    align-items: center;
     padding: 1rem;
-    border-radius: 1rem;
-    cursor: pointer;
-    .description {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-      flex: auto;
-    }
-    .meta {
-      width: 30px;
-      align-self: flex-start;
-    }
-    .name {
-      font-weight: bold;
-      font-size: 1.2rem;
-    }
-    .ava {
-      width: 48px;
-      height: 48px;
-      margin-right: 1rem;
-      border-radius: 50%;
-      flex: none;
-    }
-    .preview {
-      height: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      word-break: break-all;
-      width: 100%;
-      margin: 0;
-      color: #797c7e;
-      margin-top: 0.5rem;
-      font-size: 1.1rem;
-    }
-    
-    &:hover {
-      background: #f4f4f5;
-    }
-  }
-  
-}
-
-.search-input {
-  background: #f4f4f5;
-  display: flex;
-  flex: auto;
-  height: 3rem;
-  overflow: hidden;
-  align-items: center;
-  border-radius: 1.5rem;
-  
-  input {
-    border: 0;
-    background: transparent;
-    height: 100%;
-    flex: auto;
-    appearance: none;
-    font-size: 0.9rem;
-    
-    &:focus {
-      outline: none;
-    }
-  }
-  
-  .search-button {
-    cursor: pointer;
-    width: 20px;
-    height: 100%;
-    appearance: none;
-    border: 0;
-    background: url("~app/ui/assets/search_svg.svg") no-repeat center center transparent;
-    padding-left: 2.2rem;
-    &:focus {
-      outline: none;
-    }
-    
-    &:active {
-    }
   }
 }

@@ -17,6 +17,7 @@ class LoginLayout {
     <main class="l-login">
       <Stepper
         className="login-box"
+<<<<<<< HEAD
         innerProps={{
           main: this,
         }}
@@ -24,6 +25,12 @@ class LoginLayout {
           0: CountryPhone,
           1: SmsForm,
           2: PasswordForm
+=======
+        steps={{
+          0: CountryPhone,
+          1: SmsForm,
+          2: PasswordForm,
+>>>>>>> master
         }}
         onEnd={this.onEnd}
       />

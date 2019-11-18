@@ -1,6 +1,6 @@
-import { T } from 'app/core/dom';
-import './chat-layout.less';
-import ava from 'app/ui/assets/TwoFactorSetupMonkeyClose.svg';
+import { T, Component } from "app/core/dom";
+
+import "./chat-layout.less";
 
 interface ChatLayoutProps {
   children: any;
@@ -8,48 +8,24 @@ interface ChatLayoutProps {
 
 class LeftSidebar {
   props: any;
-  render = () => <aside class="dialogs-sidebar">{this.props.children}</aside>;
+  render = () => <aside>{this.props.children}</aside>;
 }
 
 class RightSidebar {
-  render = () => <aside class="messages-sidebar" />;
+  render = () => <aside />;
 }
 
 class Message {
-  render = ({ text, img }: any) => (
-    <div class="dialogs-item">
-      <img  loading="lazy" class="ava" src={img} />
-      <div class="description">
-        <span class="name">{"Tele Gram"}</span>
-        <span class="preview">{text}</span>
-      </div>
-      <div class="meta">
-        <span className="time">21:48</span>
-        <div className="counter"></div>
-      </div>
-    </div>
-  );
-}
-
-class SearchInput {
-  render = () => (
-    <div class="search-input">
-      <button class="search-button" />
-      <input placeholder="Search" />
-    </div>
-  );
+  render = ({ text }: any) => <div class="dialogs-item">{text}</div>;
 }
 
 class MessageHistory {
   render = () => (
     <div class="dialogs">
-      <div class="dialogs-search">
-        <div class="drawer"></div>
-        <SearchInput />
-      </div>
+      <div class="dialogs-search" />
       <div class="dialogs-wrap">
         {new Array(100).fill(0).map((_, i) => (
-          <Message text={"mtproto"} img={ava} />
+          <Message text={i} />
         ))}
       </div>
     </div>
@@ -66,7 +42,7 @@ class ChatLayout {
         <section>
           <header />
         </section>
-        {/*<RightSidebar />*/}
+        {/* <RightSidebar /> */}
       </div>
     </main>
   );
