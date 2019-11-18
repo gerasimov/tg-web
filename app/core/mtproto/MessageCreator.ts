@@ -24,13 +24,13 @@ export class MessageCreator {
       bytes = new Uint8Array(bytes);
     }
     const len = bytes.length;
-    if ((bits % 32) || (len * 8) !== bits) {
-      console.error('Invalid bits: ' + bits + ', ' + bytes.length);
-      return this;
+    if (bits % 32 || len * 8 != bits) {
+      throw new Error('Invalid bits: ' + bits + ', ' + bytes.length);
     }
 
     this.byteView.set(bytes, this.offset);
     this.offset += len;
+
     return this;
   }
 
@@ -104,8 +104,27 @@ export class MessageCreator {
     if (data === undefined) {
       data = '';
     }
+    const sUTF8 = unescape(encodeURIComponent(data));
 
-    return this.bytes(unescape(encodeURIComponent(data)));
+    const len = sUTF8.length;
+    if (len <= 253) {
+      this.byteView[this.offset++] = len;
+    } else {
+      this.byteView[this.offset++] = 254;
+      this.byteView[this.offset++] = len & 0xff;
+      this.byteView[this.offset++] = (len & 0xff00) >> 8;
+      this.byteView[this.offset++] = (len & 0xff0000) >> 16;
+    }
+    for (let i = 0; i < len; i++) {
+      this.byteView[this.offset++] = sUTF8.charCodeAt(i);
+    }
+
+    // Padding
+    while (this.offset % 4) {
+      this.byteView[this.offset++] = 0;
+    }
+
+    return this;
   }
 
   raw(bytes: any) {
@@ -113,14 +132,14 @@ export class MessageCreator {
       bytes = new Uint8Array(bytes);
     }
     const len = bytes.length;
-
+    
     this.byteView.set(bytes, this.offset);
     this.offset += len;
 
     return this;
   }
 
-  getBytes(typed: boolean): Uint8Array | number[] {
+  getBytes(typed: boolean = false): Uint8Array | number[] {
     if (typed) {
       const resultBuffer = new ArrayBuffer(this.offset);
       const resultArray = new Uint8Array(resultBuffer);
@@ -135,6 +154,18 @@ export class MessageCreator {
       bytes.push(this.byteView[i]);
     }
     return bytes;
+  }
+
+  vector(fn, data: any) {
+    const l = data.length;
+    this.int(481674261);
+    this.int(l);
+
+    for (let i = 0; i < data.length; i++) {
+      fn(this, data[i], i);
+    }
+
+    return this;
   }
 
   pack() {

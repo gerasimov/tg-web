@@ -30,6 +30,8 @@ function createNode(Component: any, props: any, childs: any) {
       case 'className':
         element.className = props[attrName];
         break;
+      case 'children':
+        break;
       default:
         if (!inst) {
           if (props[attrName] != null) {

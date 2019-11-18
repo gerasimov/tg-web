@@ -4,8 +4,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin');
-const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
-
+const CompressionPlugin = require('compression-webpack-plugin');
 const path = require('path');
 
 const mode =
@@ -18,6 +17,12 @@ module.exports = {
 
   entry: {
     app: path.resolve(process.cwd(), 'app', 'index.tsx'),
+  },
+
+  output: {
+    filename: '[name].[contenthash:12].js',
+    path: path.resolve(process.cwd(), 'dist'),
+    publicPath: '/',
   },
 
   resolve: {
@@ -45,8 +50,12 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader'],
       },
       {
-        test: /\.(png|svg)?$/,
-        use: ['file-loader'],
+        test: /\.(png|jpg|gif|svg)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
       },
       {
         test: /\.worker\.js?$/,
@@ -61,10 +70,12 @@ module.exports = {
       template: path.resolve(process.cwd(), 'app', 'template.html'),
       favicon: 'app/favicon.ico',
     }),
-    new MiniCssExtractPlugin({}),
-    new BundleAnalyzerPlugin(),
-    // new WorkboxWebpackPlugin.InjectManifest({
-    //   swSrc: 'app/sw.js'
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash:12].css'
+    }),
+    // new BundleAnalyzerPlugin(),
+    // new CompressionPlugin({
+    //   algorithm: 'gzip',
     // })
   ],
 
@@ -88,5 +99,7 @@ module.exports = {
     historyApiFallback: true,
     hot: false,
     inline: false,
+    open: true,
+    compress: true
   },
 };

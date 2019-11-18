@@ -1,4 +1,5 @@
 import { lshift32 } from 'app/core/mtproto/utils';
+import { uintToInt } from 'app/core/mtproto/sharedUtils'
 
 type FieldName = string;
 
@@ -20,10 +21,19 @@ export class MessageReader {
     this.byteView = new Uint8Array(this.buffer);
   }
 
-  _int() {
-    let i = this.intView[this.offset / 4];
-    this.offset += 4;
+  extend(field: string, val: any) {
+    this.result[field] = val;
+    
+    return this;
+  }
 
+  _int(onlyRead = false) {
+    let i = this.intView[this.offset / 4];
+    
+    if (!onlyRead) {
+      this.offset += 4;
+    }
+    
     return i;
   }
 
@@ -49,44 +59,49 @@ export class MessageReader {
     for (let i = 0; i < len; i++) {
       bytes.push(this.byteView[this.offset++]);
     }
-    
+
     return bytes;
   }
 
-  int128(field: FieldName, signed = false) {
-    this.result[field] = this.intBytes(128, signed);
+  int64(field: FieldName, typed = false) {
+    this.result[field] = this.intBytes(64, typed);
 
     return this;
   }
 
-  int256(field: FieldName, signed = false) {
-    this.result[field] = this.intBytes(256, signed);
+  int128(field: FieldName, typed = false) {
+    this.result[field] = this.intBytes(128, typed);
 
     return this;
   }
 
-  int512(field: FieldName, signed = false) {
-    this.result[field] = this.intBytes(512, signed);
+  int256(field: FieldName, typed = false) {
+    this.result[field] = this.intBytes(256, typed);
 
     return this;
   }
 
-  vector(type: string, field: string) {
-    this._int();
+  int512(field: FieldName, typed = false) {
+    this.result[field] = this.intBytes(512, typed);
+
+    return this;
+  }
+
+  vector(fn: (reader: MessageReader) => any, field: string) {
+    this._int(); // pass vector type
     const counts = this._int();
     const res = [];
-
+    
     for (let i = 0; i < counts; i++) {
-      res.push(this._long());
+      res.push(fn(this));
     }
 
     this.result[field] = res;
-
+    
     return this;
   }
 
-  bytes(field: FieldName) {
-    let len = this.byteView[this.offset++];
+  _bytes(len = this.byteView[this.offset++], onlyRead = false) {
 
     if (len == 254) {
       len =
@@ -96,44 +111,72 @@ export class MessageReader {
     }
 
     let bytes = this.byteView.subarray(this.offset, this.offset + len);
-    this.offset += len;
+    if (!onlyRead) {
+      this.offset += len;
 
-    // Padding
-    while (this.offset % 4) {
-      this.offset++;
+      // Padding
+      while (this.offset % 4) {
+        this.offset++;
+      }
     }
 
-    this.result[field] = bytes;
+    return bytes;
+  }
+  
+  bytes(field: FieldName) {
+    this.result[field] = this._bytes();
 
     return this;
   }
-
-  rawBytes(field: string, len?: number) {
-    if (!len) {
-      len = this.byteView[this.offset / 4];
-      this.offset += 4;
+  
+  _rawBytes(len?: number, typed: boolean = false) {
+    if (len == null) {
+      len = this._int();
+      if (len > this.byteView.byteLength) {
+        throw new Error(
+          'Invalid raw bytes length: ' +
+          len +
+          ', buffer len: ' +
+          this.byteView.byteLength,
+        );
+      }
     }
-    const result = this.byteView.subarray(this.offset, this.offset + len);
 
-    this.offset += len;
+    if (typed) {
+      const bytes = new Uint8Array(len);
+      bytes.set(this.byteView.subarray(this.offset, this.offset + len));
+      this.offset += len;
 
-    this.result[field] = result;
+      return bytes;
+    }
+
+    const bytes = [];
+    for (let i = 0; i < len; i++) {
+      bytes.push(this.byteView[this.offset++]);
+    }
+
+    return bytes;
+  }
+
+  rawBytes(field: string, len?: number, typed: boolean = false) {
+    this.result[field] = this._bytes(len, typed);
+
     return this;
   }
 
   bool(field: FieldName) {
-    let i = this._int();
+    let i = uintToInt(this._int());
 
-    if (i === 0x997275b5) {
+    if (i === -1720552011) {
       this.result[field] = true;
-      return true;
-    } else if (i === 0xbc799737) {
+      return this;
+    } else if (i === -1132882121) {
       this.result[field] = false;
-
-      return false;
+      return this;
     }
 
     this.offset -= 4;
+    return this;
   }
 
   _long() {

@@ -6,20 +6,20 @@ import { getMsgKeyIv } from 'app/core/mtproto/crypto/msgKeyIv'
 import { bytesModPow } from 'app/core/mtproto/crypto/powMod'
 import { sha256Hash } from 'app/core/mtproto/crypto/sha256'
 
+console.log = () => {};
 
 console.log('worker');
 onmessage = async ({ data }) => {
-  const { type } = data;
+  const { type, id } = data;
 
   const response = promise =>
-    promise
-      .then(res => postMessage({ type, res }))
-      .catch(() => postMessage({ error: true }));
+    Promise.resolve(promise)
+      .then(res => postMessage({ type, res, id }))
+      .catch((e) => postMessage({ error: e.message, id }));
 
   switch (type) {
     case 'factor': {
-      const res = pqPrimeFactorization(...data.args);
-      return postMessage({ type, res });
+      return response(pqPrimeFactorization(...data.args))
     }
     case 'sha1': {
       return response(sha1Hash(...data.args));
@@ -28,34 +28,21 @@ onmessage = async ({ data }) => {
       return response(sha256Hash(...data.args));
     }
     case 'rsa-encrypt': {
-      const res = rsaEncrypt(...data.args);
-      return postMessage({
-        type,
-        res,
-      });
+      return response(rsaEncrypt(...data.args))
     }
     case 'aes-encrypt': {
-      return postMessage({
-        type,
-        res: aesEncryptSync(...data.args),
-      });
+      return response(aesEncryptSync(...data.args));
     }
     case 'aes-decrypt': {
-      return postMessage({
-        type,
-        res: aesDecryptSync(...data.args),
-      });
+      return response(aesDecryptSync(...data.args));
     }
     case 'bytes-pow': {
-      return postMessage({
-        type,
-        res: bytesModPow(...data.args),
-      });
+      return response(bytesModPow(...data.args));
     }
-    case 'get-msgkey-iv': {
+    case 'get-iv': {
       return response(getMsgKeyIv(...data.args));
     }
     default:
-      postMessage({ error: true });
+      postMessage(response(Promise.reject({ error: true })));
   }
 };

@@ -21,7 +21,7 @@ export class Stepper {
       return this.props.onEnd();
     }
 
-    const el = <StepComponent next={this.nextStep} prev={this.prevStep} />;
+    const el = <StepComponent {...this.props.innerProps} next={this.nextStep} prev={this.prevStep} />;
 
     if (cont.firstChild) {
       cont.firstChild.replaceWith(el);
@@ -30,7 +30,7 @@ export class Stepper {
     }
   };
 
-  nextStep = () => {
+  nextStep = (e) => {
     this.step++;
     this.renderStep();
   };

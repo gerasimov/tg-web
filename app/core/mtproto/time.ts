@@ -4,12 +4,12 @@ import { nextRandomInt } from 'app/core/mtproto/sharedUtils';
 let lastMessageID = [0, 0];
 let timeOffset = 0;
 
-export function tsNow(seconds): number {
+export function tsNow(seconds: number = 0): number {
   var t = +new Date() + (timeOffset || 0);
   return seconds ? Math.floor(t / 1000) : t;
 }
 
-export function generateMessageID() {
+export function generateMessageID(): string {
   const timeTicks = tsNow(),
     timeSec = Math.floor(timeTicks / 1000) + timeOffset,
     timeMSec = timeTicks % 1000,
@@ -28,7 +28,7 @@ export function generateMessageID() {
   return lshift32(messageID[0], messageID[1]);
 }
 
-export function applyServerTime(serverTime, localTime = tsNow()) {
+export function applyServerTime(serverTime: number, localTime = tsNow()) {
   const newTimeOffset = serverTime - Math.floor(localTime / 1000);
   const changed = Math.abs(timeOffset - newTimeOffset) > 10;
 

@@ -1,6 +1,5 @@
-import { addPadding } from 'app/core/mtproto/sharedUtils'
 import { bigInt2str, powMod, str2bigInt } from 'leemon'
-import { bytesFromHex, bytesToHex } from 'app/core/mtproto/crypto/shared'
+import { bytesFromHex, bytesToHex, addPadding} from 'app/core/mtproto/crypto/shared'
 
 export function rsaEncrypt(publicKey, bytes) {
   bytes = addPadding(bytes, 255);

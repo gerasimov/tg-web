@@ -4,19 +4,21 @@ const observers: any = {};
 
 export function Destroyable(target: any) {
   const originalMethod = target.prototype.init;
-  const hasDestroy = Boolean(target.prototype.destroy);
 
-  if (hasDestroy) {
-    target.prototype.init = function() {
-      if (originalMethod != null) {
-        originalMethod.call(this);
-      }
+
+  target.prototype.init = function() {
+    if (originalMethod != null) {
+      originalMethod.call(this);
+    }
+    const hasDestroy = Boolean(this.destroy);
+
+    if (hasDestroy) {
       addDestroyObserver({
         el: this.rootEl,
         cb: this.destroy,
       });
-    };
-  }
+    }
+  };
 }
 
 export function addDestroyObserver({

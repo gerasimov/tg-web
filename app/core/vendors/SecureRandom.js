@@ -64,15 +64,11 @@ function rng_get_byte() {
   return rng_state.next();
 }
 
-function rng_get_bytes(ba) {
+export function rng_get_bytes(ba) {
   var i;
   for (i = 0; i < ba.length; ++i) ba[i] = rng_get_byte();
   return ba;
 }
-
-export function SecureRandom() {}
-
-SecureRandom.prototype.nextBytes = rng_get_bytes;
 
 // prng4.js - uses Arcfour as a PRNG
 

@@ -1,5 +1,4 @@
 import { MessageCreator } from 'app/core/mtproto/MessageCreator';
-import { MessageReader } from 'app/core/mtproto/MessageReader';
 
 type PQInnerPayload = {
   pq: number[];

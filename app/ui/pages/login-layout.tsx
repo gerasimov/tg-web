@@ -17,10 +17,13 @@ class LoginLayout {
     <main class="l-login">
       <Stepper
         className="login-box"
+        innerProps={{
+          main: this,
+        }}
         steps={{
           0: CountryPhone,
           1: SmsForm,
-          2: PasswordForm,
+          2: PasswordForm
         }}
         onEnd={this.onEnd}
       />

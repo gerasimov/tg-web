@@ -1,4 +1,4 @@
-import CryptoJS from 'app/core/mtproto/vendors/cryptojs';
+import CryptoJS from 'app/core/vendors/cryptojs';
 import { convertToUint8Array } from 'app/core/mtproto/crypto/shared';
 import { bytesFromWords, bytesToWords } from 'app/core/mtproto/crypto/aes'
 
@@ -15,18 +15,18 @@ export function sha256HashSync(bytes) {
 }
 
 export const sha256Hash = async bytes => {
-  const bytesTyped = convertToUint8Array(bytes);
   if (!useSha256Crypto) {
     return sha256HashSync(bytes);
   }
 
   try {
+    const bytesTyped = convertToUint8Array(bytes);
     const identity = await webCrypto.digest({ name: 'SHA-256' }, bytesTyped);
     console.log('native crypto');
     return identity;
   } catch (e) {
     useSha256Crypto = false;
     console.error('Crypto digest error', e);
-    return sha256HashSync(bytes);
+    return Promise.resolve(sha256HashSync(bytes));
   }
 };
